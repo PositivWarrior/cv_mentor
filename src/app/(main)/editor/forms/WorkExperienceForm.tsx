@@ -2,12 +2,14 @@ import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { EditorFormProps } from "@/lib/types";
 import { workExperienceSchema, WorkExperienceValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -120,6 +122,85 @@ function WorkExperienceItem({ form, index, remove }: WorkExperienceItemProps) {
                     </FormItem>
                 )}
             />
+
+            <FormField
+                control={form.control}
+                name={`workExperiences.${index}.company`}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Company</FormLabel>
+                        <FormControl>
+                            <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+                <FormField
+                    control={form.control}
+                    name={`workExperiences.${index}.startDate`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Start Date</FormLabel>
+                            <FormControl>
+                                <Input
+                                    {...field}
+                                    type="date"
+                                    value={field.value?.slice(0, 10)}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name={`workExperiences.${index}.endDate`}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>End Date</FormLabel>
+                            <FormControl>
+                                <Input
+                                    {...field}
+                                    type="date"
+                                    value={field.value?.slice(0, 10)}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
+
+            <FormDescription>
+                Leave <span className="font-semibold">end date</span> blank if
+                you are currently working in this job
+            </FormDescription>
+
+            <FormField
+                control={form.control}
+                name={`workExperiences.${index}.description`}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                            <Textarea {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+
+            <Button
+                variant="destructive"
+                type="button"
+                onClick={() => remove(index)}
+            >
+                Remove
+            </Button>
         </div>
     );
 }
