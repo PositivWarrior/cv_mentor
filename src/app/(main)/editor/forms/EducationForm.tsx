@@ -95,6 +95,21 @@ interface EducationItemProps {
 }
 
 function EducationItem({ form, index, remove }: EducationItemProps) {
+    // Date field handling
+    const handleDateChange = (
+        field: any,
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const newValue = e.target.value;
+        field.onChange(newValue || undefined);
+    };
+
+    // Helper function to format dates for input elements
+    const formatDateForInput = (dateString?: string) => {
+        if (!dateString) return "";
+        return dateString;
+    };
+
     return (
         <div className="space-y-3 rounded-md border bg-background p-3">
             <div className="flex justify-between gap-2">
@@ -139,9 +154,9 @@ function EducationItem({ form, index, remove }: EducationItemProps) {
                             <FormLabel>Start Date</FormLabel>
                             <FormControl>
                                 <Input
-                                    {...field}
                                     type="date"
-                                    value={field.value?.slice(0, 10)}
+                                    value={formatDateForInput(field.value)}
+                                    onChange={(e) => handleDateChange(field, e)}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -157,9 +172,9 @@ function EducationItem({ form, index, remove }: EducationItemProps) {
                             <FormLabel>End Date</FormLabel>
                             <FormControl>
                                 <Input
-                                    {...field}
                                     type="date"
-                                    value={field.value?.slice(0, 10)}
+                                    value={formatDateForInput(field.value)}
+                                    onChange={(e) => handleDateChange(field, e)}
                                 />
                             </FormControl>
                             <FormMessage />

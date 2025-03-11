@@ -36,21 +36,23 @@ export default function ResumeEditor() {
             </header>
 
             <div className="flex flex-1 overflow-hidden">
-                <div className="w-full space-y-8 overflow-y-auto border-r p-3 md:w-1/2">
-                    <Breadcrumbs
-                        currentStep={currentStep}
-                        setCurrentStep={setStep}
-                    />
-                    {FormComponent && (
-                        <div className="pt-2">
-                            <FormComponent
-                                resumeData={resumeData}
-                                setResumeData={setResumeData}
-                            />
-                        </div>
-                    )}
+                <div className="w-full overflow-y-auto border-r p-3 md:w-2/5">
+                    <div className="space-y-8">
+                        <Breadcrumbs
+                            currentStep={currentStep}
+                            setCurrentStep={setStep}
+                        />
+                        {FormComponent && (
+                            <div className="pt-2">
+                                <FormComponent
+                                    resumeData={resumeData}
+                                    setResumeData={setResumeData}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
-                <div className="hidden md:block md:w-1/2">
+                <div className="hidden md:block md:w-3/5">
                     <ResumePreviewSection
                         resumeData={resumeData}
                         setResumeData={setResumeData}

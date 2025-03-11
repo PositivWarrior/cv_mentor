@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { formatDate } from "date-fns";
+import { format, formatDate } from "date-fns";
+import { Badge } from "./ui/badge";
 
 interface ResumePreviewProps {
     resumeData: ResumeValues;
@@ -21,7 +22,7 @@ export default function ResumePreview({
     return (
         <div
             className={cn(
-                "aspect-[210/297] h-fit w-full bg-white text-black",
+                "aspect-[210/297] h-auto w-full bg-white text-black",
                 className,
             )}
             ref={containerRef}
@@ -29,12 +30,14 @@ export default function ResumePreview({
             <div
                 className={cn("space-y-6 p-6", !width && "invisible")}
                 style={{
-                    zoom: (1 / 794) * width,
+                    zoom: Math.max((1 / 794) * width, 0.7),
                 }}
             >
                 <PersonalInfoHeader resumeData={resumeData} />
                 <SummarySection resumeData={resumeData} />
                 <WorkExperienceSection resumeData={resumeData} />
+                <EducationSection resumeData={resumeData} />
+                <SkillsSection resumeData={resumeData} />
             </div>
         </div>
     );
@@ -123,6 +126,27 @@ function SummarySection({ resumeData }: ResumeSectionProps) {
     );
 }
 
+function formatMonthYear(dateString?: string) {
+    if (!dateString) return "";
+
+    const parts = dateString.split("-");
+    // If it's already in YYYY-MM-DD format from HTML input, parse it directly
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const parts = dateString.split("-");
+        // Return MM/YYYY format (parts[1] is month, parts[0] is year)
+        return `${parts[1]}/${parts[0]}`;
+    }
+
+    // Otherwise try standard date parsing
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "";
+        return format(date, "MM/yyyy");
+    } catch (error) {
+        return "";
+    }
+}
+
 function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
     const { workExperiences } = resumeData;
 
@@ -157,6 +181,65 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
                         </div>
                     </div>
                 ))}
+            </div>
+        </>
+    );
+}
+
+function EducationSection({ resumeData }: ResumeSectionProps) {
+    const { educations } = resumeData;
+
+    const educationsNotEmpty = educations?.filter(
+        (edu) => Object.values(edu).filter(Boolean).length > 0,
+    );
+
+    if (!educationsNotEmpty?.length) return null;
+
+    return (
+        <>
+            <hr className="border-2" />
+            <div className="space-y-3">
+                <p className="text-lg font-semibold">Education</p>
+                {educationsNotEmpty.map((edu, index) => (
+                    <div key={index} className="break-inside-avoid space-y-1">
+                        <div className="flex items-center justify-between text-sm font-semibold">
+                            <span>{edu.degree}</span>
+                            {edu.startDate && (
+                                <span>
+                                    {edu.startDate &&
+                                        `${formatDate(edu.startDate, "MM/yyyy")} ${edu.endDate ? `- ${formatDate(edu.endDate, "MM/yyyy")}` : ""}`}
+                                </span>
+                            )}
+                        </div>
+
+                        <p className="text-xs font-semibold">{edu.school}</p>
+                    </div>
+                ))}
+            </div>
+        </>
+    );
+}
+
+function SkillsSection({ resumeData }: ResumeSectionProps) {
+    const { skills } = resumeData;
+
+    if (!skills?.length) return null;
+
+    return (
+        <>
+            <hr className="2 border" />
+            <div className="break-inside-avoid space-y-3">
+                <p className="text-lg font-semibold">Skills</p>
+                <div className="flex break-inside-avoid flex-wrap gap-2">
+                    {skills.map((skill, index) => (
+                        <Badge
+                            key={index}
+                            className="rounded-md bg-black text-white hover:bg-black"
+                        >
+                            {skill}
+                        </Badge>
+                    ))}
+                </div>
             </div>
         </>
     );

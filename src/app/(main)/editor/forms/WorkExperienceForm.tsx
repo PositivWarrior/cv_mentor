@@ -100,6 +100,21 @@ interface WorkExperienceItemProps {
 }
 
 function WorkExperienceItem({ form, index, remove }: WorkExperienceItemProps) {
+    // Date field handling
+    const handleDateChange = (
+        field: any,
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const newValue = e.target.value;
+        field.onChange(newValue || undefined);
+    };
+
+    // Helper function to format dates for input elements
+    const formatDateForInput = (dateString?: string) => {
+        if (!dateString) return "";
+        return dateString;
+    };
+
     return (
         <div className="space-y-3 rounded-md border bg-background p-3">
             <div className="flex justify-between gap-2">
@@ -146,9 +161,9 @@ function WorkExperienceItem({ form, index, remove }: WorkExperienceItemProps) {
                             <FormLabel>Start Date</FormLabel>
                             <FormControl>
                                 <Input
-                                    {...field}
                                     type="date"
-                                    value={field.value?.slice(0, 10)}
+                                    value={formatDateForInput(field.value)}
+                                    onChange={(e) => handleDateChange(field, e)}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -164,9 +179,9 @@ function WorkExperienceItem({ form, index, remove }: WorkExperienceItemProps) {
                             <FormLabel>End Date</FormLabel>
                             <FormControl>
                                 <Input
-                                    {...field}
                                     type="date"
-                                    value={field.value?.slice(0, 10)}
+                                    value={formatDateForInput(field.value)}
+                                    onChange={(e) => handleDateChange(field, e)}
                                 />
                             </FormControl>
                             <FormMessage />
