@@ -1,7 +1,6 @@
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -9,19 +8,19 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { EditorFormProps } from "@/lib/types";
-import { skillsSchema, SkillsValues } from "@/lib/validation";
+import { summarySchema, SummaryValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { form, useForm } from "react-hook-form";
 
-export default function SkillsForm({
+export default function SummaryForm({
     resumeData,
     setResumeData,
 }: EditorFormProps) {
-    const form = useForm<SkillsValues>({
-        resolver: zodResolver(skillsSchema),
+    const form = useForm<SummaryValues>({
+        resolver: zodResolver(summarySchema),
         defaultValues: {
-            skills: resumeData.skills || [],
+            summary: resumeData.summary || "",
         },
     });
 
@@ -33,11 +32,7 @@ export default function SkillsForm({
 
             setResumeData({
                 ...resumeData,
-                skills:
-                    values.skills
-                        ?.filter((skill) => skill !== undefined)
-                        .map((skill) => skill.trim())
-                        .filter((skill) => skill !== "") || [],
+                ...values,
             });
         });
 
@@ -47,9 +42,10 @@ export default function SkillsForm({
     return (
         <div className="mx-auto max-w-xl space-y-6">
             <div className="space-y-1.5 text-center">
-                <h2 className="text-2xl font-semibold">Skills</h2>
+                <h2 className="text-2xl font-semibold">Professional Summary</h2>
                 <p className="text-sm text-muted-foreground">
-                    What are you good at?
+                    Write a short introduction for your resume or let AI do it
+                    for you
                 </p>
             </div>
 
@@ -57,32 +53,24 @@ export default function SkillsForm({
                 <form className="space-y-3">
                     <FormField
                         control={form.control}
-                        name="skills"
+                        name="summary"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel className="sr-only">
-                                    Skills
+                                    Professional summary
                                 </FormLabel>
+
                                 <FormControl>
                                     <Textarea
                                         {...field}
-                                        placeholder="Enter your skills e.g. React, Next.js, Tailwind CSS, graphic design, etc."
-                                        onChange={(e) => {
-                                            const skills =
-                                                e.target.value.split(",");
-                                            field.onChange(skills);
-                                        }}
+                                        placeholder="A brief, engaging text about yourself"
                                     />
                                 </FormControl>
-
-                                <FormDescription>
-                                    Separate skills with a comma
-                                </FormDescription>
 
                                 <FormMessage />
                             </FormItem>
                         )}
-                    ></FormField>
+                    />
                 </form>
             </Form>
         </div>
