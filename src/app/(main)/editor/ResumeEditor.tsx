@@ -6,6 +6,7 @@ import Breadcrumbs from "./Breadcrumbs";
 import Footer from "./Footer";
 import { useState } from "react";
 import { ResumeValues } from "@/lib/validation";
+import ResumePreviewSection from "./ResumePreviewSection";
 
 export default function ResumeEditor() {
     const searchParams = useSearchParams();
@@ -34,25 +35,26 @@ export default function ResumeEditor() {
                 </p>
             </header>
 
-            <div className="flex-1 overflow-auto">
-                <div className="flex h-full">
-                    <div className="w-full space-y-8 border-r p-3 md:w-1/2">
-                        <Breadcrumbs
-                            currentStep={currentStep}
-                            setCurrentStep={setStep}
-                        />
-                        {FormComponent && (
-                            <div className="pt-2">
-                                <FormComponent
-                                    resumeData={resumeData}
-                                    setResumeData={setResumeData}
-                                />
-                            </div>
-                        )}
-                    </div>
-                    <div className="hidden w-1/2 md:block">
-                        <pre>{JSON.stringify(resumeData, null, 2)}</pre>
-                    </div>
+            <div className="flex flex-1 overflow-hidden">
+                <div className="w-full space-y-8 overflow-y-auto border-r p-3 md:w-1/2">
+                    <Breadcrumbs
+                        currentStep={currentStep}
+                        setCurrentStep={setStep}
+                    />
+                    {FormComponent && (
+                        <div className="pt-2">
+                            <FormComponent
+                                resumeData={resumeData}
+                                setResumeData={setResumeData}
+                            />
+                        </div>
+                    )}
+                </div>
+                <div className="hidden md:block md:w-1/2">
+                    <ResumePreviewSection
+                        resumeData={resumeData}
+                        setResumeData={setResumeData}
+                    />
                 </div>
             </div>
 

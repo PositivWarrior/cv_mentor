@@ -11,7 +11,7 @@ import { EditorFormProps } from "@/lib/types";
 import { summarySchema, SummaryValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 export default function SummaryForm({
     resumeData,
