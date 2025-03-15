@@ -1,5 +1,6 @@
 import ResumePreview from "@/components/ResumePreview";
 import { ResumeValues } from "@/lib/validation";
+import ColorPicker from "./ColorPicker";
 
 interface ResumePreviewSectionProps {
     resumeData: ResumeValues;
@@ -11,7 +12,10 @@ export default function ResumePreviewSection({
     setResumeData,
 }: ResumePreviewSectionProps) {
     return (
-        <div className="h-full w-full">
+        <div className="relative h-full w-full">
+            <div>
+                <ColorPicker />
+            </div>
             <div className="flex h-full w-full items-center justify-center overflow-auto bg-secondary p-6">
                 <ResumePreview
                     resumeData={resumeData}

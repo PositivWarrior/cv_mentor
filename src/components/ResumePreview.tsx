@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { ResumeValues } from "@/lib/validation";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { format, formatDate } from "date-fns";
+import { formatDate } from "date-fns";
 import { Badge } from "./ui/badge";
 
 interface ResumePreviewProps {
@@ -57,6 +57,8 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
         country,
         phone,
         email,
+        colorHex,
+        borderStyle,
     } = resumeData;
 
     const [photoSrc, setPhotoSrc] = useState(
@@ -124,27 +126,6 @@ function SummarySection({ resumeData }: ResumeSectionProps) {
             </div>
         </>
     );
-}
-
-function formatMonthYear(dateString?: string) {
-    if (!dateString) return "";
-
-    const parts = dateString.split("-");
-    // If it's already in YYYY-MM-DD format from HTML input, parse it directly
-    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        const parts = dateString.split("-");
-        // Return MM/YYYY format (parts[1] is month, parts[0] is year)
-        return `${parts[1]}/${parts[0]}`;
-    }
-
-    // Otherwise try standard date parsing
-    try {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return "";
-        return format(date, "MM/yyyy");
-    } catch (error) {
-        return "";
-    }
 }
 
 function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
