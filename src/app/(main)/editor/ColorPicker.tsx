@@ -4,7 +4,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { PaletteIcon, Twitter } from "lucide-react";
+import { PaletteIcon } from "lucide-react";
 import { useState } from "react";
 import { ColorChangeHandler, Color, TwitterPicker } from "react-color";
 

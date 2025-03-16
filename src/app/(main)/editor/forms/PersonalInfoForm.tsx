@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { EditorFormProps } from "@/lib/types";
 import { personalInfoSchema, PersonalInfoValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 export default function PersonalInfoForm({
@@ -33,17 +34,13 @@ export default function PersonalInfoForm({
     useEffect(() => {
         const { unsubscribe } = form.watch(async (values) => {
             const isValid = await form.trigger();
-
             if (!isValid) return;
-
-            setResumeData({
-                ...resumeData,
-                ...values,
-            });
+            setResumeData({ ...resumeData, ...values });
         });
-
         return unsubscribe;
     }, [form, resumeData, setResumeData]);
+
+    const photoInputRef = useRef<HTMLInputElement>(null);
 
     return (
         <div className="mx-auto max-w-xl space-y-6">
@@ -62,17 +59,35 @@ export default function PersonalInfoForm({
                         render={({ field: { value, ...fieldValues } }) => (
                             <FormItem>
                                 <FormLabel>Your Picture</FormLabel>
-                                <FormControl>
-                                    <Input
-                                        {...fieldValues}
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            fieldValues.onChange(file);
+                                <div className="flex items-center gap-2">
+                                    <FormControl>
+                                        <Input
+                                            {...fieldValues}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file =
+                                                    e.target.files?.[0];
+                                                fieldValues.onChange(file);
+                                            }}
+                                            ref={photoInputRef}
+                                        />
+                                    </FormControl>
+
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        onClick={() => {
+                                            fieldValues.onChange(null);
+                                            if (photoInputRef.current) {
+                                                photoInputRef.current.value =
+                                                    "";
+                                            }
                                         }}
-                                    />
-                                </FormControl>
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
                                 <FormMessage />
                             </FormItem>
                         )}
