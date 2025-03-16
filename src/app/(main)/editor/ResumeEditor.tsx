@@ -7,11 +7,13 @@ import Footer from "./Footer";
 import { useState } from "react";
 import { ResumeValues } from "@/lib/validation";
 import ResumePreviewSection from "./ResumePreviewSection";
+import { cn } from "@/lib/utils";
 
 export default function ResumeEditor() {
     const searchParams = useSearchParams();
 
     const [resumeData, setResumeData] = useState<ResumeValues>({});
+    const [showSmResumePreview, setShowSmResumePreview] = useState(false);
 
     const currentStep = searchParams.get("step") || steps[0].key;
 
@@ -36,7 +38,13 @@ export default function ResumeEditor() {
             </header>
 
             <div className="flex flex-1 overflow-hidden">
-                <div className="w-full overflow-y-auto border-r p-3 md:w-2/5">
+                <div
+                    className={cn(
+                        "w-full overflow-y-auto border-r p-3 md:w-2/5",
+                        showSmResumePreview && "hidden",
+                        !showSmResumePreview && "md:block",
+                    )}
+                >
                     <div className="space-y-8">
                         <Breadcrumbs
                             currentStep={currentStep}
@@ -52,7 +60,13 @@ export default function ResumeEditor() {
                         )}
                     </div>
                 </div>
-                <div className="hidden md:block md:w-3/5">
+                <div
+                    className={cn(
+                        "hidden h-full w-full md:w-3/5",
+                        showSmResumePreview && "block",
+                        !showSmResumePreview && "md:block",
+                    )}
+                >
                     <ResumePreviewSection
                         resumeData={resumeData}
                         setResumeData={setResumeData}
@@ -60,7 +74,12 @@ export default function ResumeEditor() {
                 </div>
             </div>
 
-            <Footer currentStep={currentStep} setCurrentStep={setStep} />
+            <Footer
+                currentStep={currentStep}
+                setCurrentStep={setStep}
+                showSmResumePreview={showSmResumePreview}
+                setShowSmResumePreview={setShowSmResumePreview}
+            />
         </div>
     );
 }
