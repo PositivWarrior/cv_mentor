@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { resumeSchema, ResumeValues } from "@/lib/validation";
 import { auth } from "@clerk/nextjs/server";
 import { del, put } from "@vercel/blob";
-import { pathToFileURL } from "url";
+import { extname } from "path";
 
 export async function saveResume(values: ResumeValues) {
     const { id } = values;
@@ -37,13 +37,9 @@ export async function saveResume(values: ResumeValues) {
             await del(existingResume.photoUrl);
         }
 
-        const blob = await put(
-            `resume_photos/${pathToFileURL.extname(photo.name)}`,
-            photo,
-            {
-                access: "public",
-            },
-        );
+        const blob = await put(`resume_photos/${extname(photo.name)}`, photo, {
+            access: "public",
+        });
 
         newPhotoUrl = blob.url;
     } else if (photo === null) {
