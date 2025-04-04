@@ -1,13 +1,18 @@
+"use client";
+
 import { Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
+import usePremiumModal from "@/hooks/usePremiumModal";
 
 const premiumFeatures = ["AI tools", "Up to 3 resumes"];
 const premiumPlusFeatures = ["Infinite resumes", "Design customizations"];
 
 export default function PremiumModal() {
+    const { open, setOpen } = usePremiumModal();
+
     return (
-        <Dialog open>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>CV Mentor - Premium</DialogTitle>
