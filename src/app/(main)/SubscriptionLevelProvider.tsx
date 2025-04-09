@@ -15,7 +15,7 @@ interface SubscriptionLevelProviderProps {
 export default function SubscriptionLevelProvider({
     children,
     userSubscriptionLevel,
-}: SubscriptionLevelProviderProps): JSX.Element {
+}: SubscriptionLevelProviderProps) {
     return (
         <SubscriptionLevelContext.Provider value={userSubscriptionLevel}>
             {children}

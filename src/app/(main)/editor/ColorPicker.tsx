@@ -4,12 +4,12 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { PaletteIcon } from "lucide-react";
-import { useState } from "react";
-import { ColorChangeHandler, Color, TwitterPicker } from "react-color";
-import { useSubscriptionLevel } from "../SubscriptionLevelProvider";
 import usePremiumModal from "@/hooks/usePremiumModal";
 import { canUseCustomizations } from "@/lib/permissions";
+import { PaletteIcon } from "lucide-react";
+import { useState } from "react";
+import { Color, ColorChangeHandler, TwitterPicker } from "react-color";
+import { useSubscriptionLevel } from "../SubscriptionLevelProvider";
 
 interface ColorPickerProps {
     color: Color | undefined;
@@ -41,7 +41,6 @@ export default function ColorPicker({ color, onChange }: ColorPickerProps) {
                     <PaletteIcon className="size-5" />
                 </Button>
             </PopoverTrigger>
-
             <PopoverContent
                 className="border-none bg-transparent shadow-none"
                 align="end"
