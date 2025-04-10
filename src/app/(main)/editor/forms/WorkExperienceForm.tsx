@@ -11,11 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { EditorFormProps } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { workExperienceSchema, WorkExperienceValues } from "@/lib/validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { GripHorizontal } from "lucide-react";
-import { useEffect } from "react";
-import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 import {
     closestCenter,
     DndContext,
@@ -25,6 +22,7 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
     arrayMove,
     SortableContext,
@@ -32,10 +30,12 @@ import {
     useSortable,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
-import { cn } from "@/lib/utils";
-import { GenerateWorkExperienceButton } from "./GenerateWorkExperienceButton";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { GripHorizontal } from "lucide-react";
+import { useEffect } from "react";
+import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
+import GenerateWorkExperienceButton from "./GenerateWorkExperienceButton";
 
 export default function WorkExperienceForm({
     resumeData,
@@ -51,9 +51,7 @@ export default function WorkExperienceForm({
     useEffect(() => {
         const { unsubscribe } = form.watch(async (values) => {
             const isValid = await form.trigger();
-
             if (!isValid) return;
-
             setResumeData({
                 ...resumeData,
                 workExperiences:
@@ -62,7 +60,6 @@ export default function WorkExperienceForm({
                     ) || [],
             });
         });
-
         return unsubscribe;
     }, [form, resumeData, setResumeData]);
 
@@ -86,9 +83,7 @@ export default function WorkExperienceForm({
                 (field) => field.id === active.id,
             );
             const newIndex = fields.findIndex((field) => field.id === over.id);
-
             move(oldIndex, newIndex);
-
             return arrayMove(fields, oldIndex, newIndex);
         }
     }
@@ -96,12 +91,11 @@ export default function WorkExperienceForm({
     return (
         <div className="mx-auto max-w-xl space-y-6">
             <div className="space-y-1.5 text-center">
-                <h2 className="text-2xl font-semibold">Work Experience</h2>
+                <h2 className="text-2xl font-semibold">Work experience</h2>
                 <p className="text-sm text-muted-foreground">
-                    Add as many work experiences as you want
+                    Add as many work experiences as you like.
                 </p>
             </div>
-
             <Form {...form}>
                 <form className="space-y-3">
                     <DndContext
@@ -114,10 +108,10 @@ export default function WorkExperienceForm({
                             items={fields}
                             strategy={verticalListSortingStrategy}
                         >
-                            {fields.map((filed, index) => (
+                            {fields.map((field, index) => (
                                 <WorkExperienceItem
-                                    id={filed.id}
-                                    key={filed.id}
+                                    id={field.id}
+                                    key={field.id}
                                     index={index}
                                     form={form}
                                     remove={remove}
@@ -125,7 +119,6 @@ export default function WorkExperienceForm({
                             ))}
                         </SortableContext>
                     </DndContext>
-
                     <div className="flex justify-center">
                         <Button
                             type="button"
@@ -139,7 +132,7 @@ export default function WorkExperienceForm({
                                 })
                             }
                         >
-                            Add Work Experience
+                            Add work experience
                         </Button>
                     </div>
                 </form>
@@ -165,41 +158,26 @@ function WorkExperienceItem({
         attributes,
         listeners,
         setNodeRef,
-        transition,
         transform,
+        transition,
         isDragging,
     } = useSortable({ id });
-
-    // Date field handling
-    const handleDateChange = (
-        field: any,
-        e: React.ChangeEvent<HTMLInputElement>,
-    ) => {
-        const newValue = e.target.value;
-        field.onChange(newValue || undefined);
-    };
-
-    // Helper function to format dates for input elements
-    const formatDateForInput = (dateString?: string) => {
-        if (!dateString) return "";
-        return dateString;
-    };
 
     return (
         <div
             className={cn(
                 "space-y-3 rounded-md border bg-background p-3",
-                isDragging && "z-100 relative cursor-grab shadow-xl",
+                isDragging && "relative z-50 cursor-grab shadow-xl",
             )}
             ref={setNodeRef}
             style={{
-                transition,
                 transform: CSS.Transform.toString(transform),
+                transition,
             }}
         >
             <div className="flex justify-between gap-2">
                 <span className="font-semibold">
-                    Work Experience {index + 1}
+                    Work experience {index + 1}
                 </span>
                 <GripHorizontal
                     className="size-5 cursor-grab text-muted-foreground focus:outline-none"
@@ -207,21 +185,19 @@ function WorkExperienceItem({
                     {...listeners}
                 />
             </div>
-
             <div className="flex justify-center">
                 <GenerateWorkExperienceButton
-                    onWorkExperienceGenerated={(exp) => {
-                        form.setValue(`workExperiences.${index}`, exp);
-                    }}
+                    onWorkExperienceGenerated={(exp) =>
+                        form.setValue(`workExperiences.${index}`, exp)
+                    }
                 />
             </div>
-
             <FormField
                 control={form.control}
                 name={`workExperiences.${index}.position`}
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Job Title</FormLabel>
+                        <FormLabel>Job title</FormLabel>
                         <FormControl>
                             <Input {...field} autoFocus />
                         </FormControl>
@@ -229,7 +205,6 @@ function WorkExperienceItem({
                     </FormItem>
                 )}
             />
-
             <FormField
                 control={form.control}
                 name={`workExperiences.${index}.company`}
@@ -243,37 +218,35 @@ function WorkExperienceItem({
                     </FormItem>
                 )}
             />
-
             <div className="grid grid-cols-2 gap-3">
                 <FormField
                     control={form.control}
                     name={`workExperiences.${index}.startDate`}
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Start Date</FormLabel>
+                            <FormLabel>Start date</FormLabel>
                             <FormControl>
                                 <Input
+                                    {...field}
                                     type="date"
-                                    value={formatDateForInput(field.value)}
-                                    onChange={(e) => handleDateChange(field, e)}
+                                    value={field.value?.slice(0, 10)}
                                 />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
-
                 <FormField
                     control={form.control}
                     name={`workExperiences.${index}.endDate`}
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>End Date</FormLabel>
+                            <FormLabel>End date</FormLabel>
                             <FormControl>
                                 <Input
+                                    {...field}
                                     type="date"
-                                    value={formatDateForInput(field.value)}
-                                    onChange={(e) => handleDateChange(field, e)}
+                                    value={field.value?.slice(0, 10)}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -281,12 +254,10 @@ function WorkExperienceItem({
                     )}
                 />
             </div>
-
             <FormDescription>
-                Leave <span className="font-semibold">end date</span> blank if
-                you are currently working in this job
+                Leave <span className="font-semibold">end date</span> empty if
+                you are currently working here.
             </FormDescription>
-
             <FormField
                 control={form.control}
                 name={`workExperiences.${index}.description`}
@@ -300,7 +271,6 @@ function WorkExperienceItem({
                     </FormItem>
                 )}
             />
-
             <Button
                 variant="destructive"
                 type="button"

@@ -1,15 +1,5 @@
+import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import {
-    GenerateWorkExperienceInput,
-    generateWorkExperienceSchema,
-    WorkExperience,
-} from "@/lib/validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { WandSparklesIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { generateWorkExperience } from "./actions";
-import { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -26,40 +16,115 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import LoadingButton from "@/components/LoadingButton";
-import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
+import { useToast } from "@/hooks/use-toast";
 import usePremiumModal from "@/hooks/usePremiumModal";
-import { canUseAiTools } from "@/lib/permissions";
+import { canUseAITools } from "@/lib/permissions";
+import {
+    GenerateWorkExperienceInput,
+    generateWorkExperienceSchema,
+    WorkExperience,
+} from "@/lib/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { WandSparklesIcon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
+import { generateWorkExperience } from "./actions";
 
 interface GenerateWorkExperienceButtonProps {
     onWorkExperienceGenerated: (workExperience: WorkExperience) => void;
 }
 
-export function GenerateWorkExperienceButton({
+export default function GenerateWorkExperienceButton({
     onWorkExperienceGenerated,
 }: GenerateWorkExperienceButtonProps) {
     const subscriptionLevel = useSubscriptionLevel();
-
+    const { toast } = useToast();
     const premiumModal = usePremiumModal();
-
     const [showInputDialog, setShowInputDialog] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+
+    // Debug the current subscription level
+    useEffect(() => {
+        console.log(
+            "GenerateWorkExperienceButton subscription level:",
+            subscriptionLevel,
+        );
+    }, [subscriptionLevel]);
+
+    const refreshSubscription = async () => {
+        try {
+            setRefreshing(true);
+            const response = await fetch("/refresh-subscription");
+            if (!response.ok) {
+                throw new Error("Failed to refresh subscription");
+            }
+
+            // Force hard reload to update client state
+            window.location.reload();
+        } catch (error) {
+            console.error("Error refreshing subscription:", error);
+            toast({
+                variant: "destructive",
+                description: "Failed to refresh subscription status",
+            });
+        } finally {
+            setRefreshing(false);
+        }
+    };
 
     return (
         <>
             <Button
                 variant="outline"
                 type="button"
-                onClick={() => {
-                    if (!canUseAiTools(subscriptionLevel)) {
+                onClick={async () => {
+                    console.log(
+                        "Button clicked, subscription level:",
+                        subscriptionLevel,
+                    );
+
+                    if (!canUseAITools(subscriptionLevel)) {
+                        console.log(
+                            "Cannot use AI tools, showing premium modal",
+                        );
+
+                        // Try refreshing subscription first
+                        if (refreshing) return;
+
+                        try {
+                            await fetch("/billing/troubleshoot");
+                            await new Promise((resolve) =>
+                                setTimeout(resolve, 500),
+                            );
+
+                            // Check if we have a pro subscription after refresh
+                            const response = await fetch(
+                                "/api/subscription-check",
+                            );
+                            const data = await response.json();
+
+                            if (data.canUseAI) {
+                                setShowInputDialog(true);
+                                return;
+                            }
+                        } catch (error) {
+                            console.error(
+                                "Failed to refresh subscription:",
+                                error,
+                            );
+                        }
+
                         premiumModal.setOpen(true);
+                        return;
                     }
+
                     setShowInputDialog(true);
                 }}
             >
                 <WandSparklesIcon className="size-4" />
                 Smart fill (AI)
             </Button>
-
             <InputDialog
                 open={showInputDialog}
                 onOpenChange={setShowInputDialog}
@@ -99,8 +164,8 @@ function InputDialog({
         } catch (error) {
             console.error(error);
             toast({
-                description: "Failed to generate work experience",
                 variant: "destructive",
+                description: "Something went wrong. Please try again.",
             });
         }
     }
@@ -109,13 +174,12 @@ function InputDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Generate Work Experience</DialogTitle>
+                    <DialogTitle>Generate work experience</DialogTitle>
                     <DialogDescription>
-                        Describe your work experience and AI will generate entry
-                        for you
+                        Describe this work experience and the AI will generate
+                        an optimized entry for you.
                     </DialogDescription>
                 </DialogHeader>
-
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
@@ -130,7 +194,7 @@ function InputDialog({
                                     <FormControl>
                                         <Textarea
                                             {...field}
-                                            placeholder="e.g. I worked at Google as a software engineer from nov 2018 to dec 2022, task were..."
+                                            placeholder={`E.g. "from nov 2019 to dec 2020 I worked at google as a software engineer, my tasks were: ..."`}
                                             autoFocus
                                         />
                                     </FormControl>
@@ -138,7 +202,6 @@ function InputDialog({
                                 </FormItem>
                             )}
                         />
-
                         <LoadingButton
                             type="submit"
                             loading={form.formState.isSubmitting}

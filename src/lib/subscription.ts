@@ -1,25 +1,54 @@
 import { env } from "@/env";
-import { cache } from "react";
 import prisma from "./prisma";
 
 export type SubscriptionLevel = "free" | "pro" | "pro_plus";
 
-export const getUserSubscriptionLevel = cache(
-    async (userId: string): Promise<SubscriptionLevel> => {
+export const getUserSubscriptionLevel = async (
+    userId: string,
+): Promise<SubscriptionLevel> => {
+    console.log("Finding subscription for user:", userId);
+
+    try {
         const subscription = await prisma.userSubscription.findUnique({
             where: {
                 userId,
             },
         });
 
-        if (!subscription || subscription.stripeCurrentPeriodEnd < new Date()) {
+        console.log("Found subscription:", subscription);
+
+        if (!subscription) {
+            console.log("No subscription found, returning free tier");
             return "free";
         }
+
+        const currentDate = new Date();
+        console.log("Current date:", currentDate);
+        console.log(
+            "Subscription end date:",
+            subscription.stripeCurrentPeriodEnd,
+        );
+
+        if (subscription.stripeCurrentPeriodEnd < currentDate) {
+            console.log("Subscription expired, returning free tier");
+            return "free";
+        }
+
+        console.log("Checking price ID:", subscription.stripePriceId);
+        console.log(
+            "Pro price ID:",
+            env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY,
+        );
+        console.log(
+            "Pro Plus price ID:",
+            env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_PLUS_MONTHLY,
+        );
 
         if (
             subscription.stripePriceId ===
             env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY
         ) {
+            console.log("Returning pro tier");
             return "pro";
         }
 
@@ -27,9 +56,14 @@ export const getUserSubscriptionLevel = cache(
             subscription.stripePriceId ===
             env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_PLUS_MONTHLY
         ) {
+            console.log("Returning pro_plus tier");
             return "pro_plus";
         }
 
+        console.log("Invalid price ID, throwing error");
         throw new Error("Invalid subscription");
-    },
-);
+    } catch (error) {
+        console.error("Error getting subscription level:", error);
+        throw error;
+    }
+};

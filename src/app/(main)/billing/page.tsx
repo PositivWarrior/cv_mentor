@@ -1,7 +1,11 @@
 import prisma from "@/lib/prisma";
 import stripe from "@/lib/stripe";
 import { auth } from "@clerk/nextjs/server";
+import { formatDate } from "date-fns";
 import { Metadata } from "next";
+import Stripe from "stripe";
+import GetSubscriptionButton from "./GetSubscriptionButton";
+import ManageSubscriptionButton from "./ManageSubscriptionButton";
 
 export const metadata: Metadata = {
     title: "Billing",
@@ -15,9 +19,7 @@ export default async function Page() {
     }
 
     const subscription = await prisma.userSubscription.findUnique({
-        where: {
-            userId,
-        },
+        where: { userId },
     });
 
     const priceInfo = subscription
@@ -37,6 +39,22 @@ export default async function Page() {
                         : "Free"}
                 </span>
             </p>
+            {subscription ? (
+                <>
+                    {subscription.stripeCancelAtPeriodEnd && (
+                        <p className="text-destructive">
+                            Your subscription will be canceled on{" "}
+                            {formatDate(
+                                subscription.stripeCurrentPeriodEnd,
+                                "MMMM dd, yyyy",
+                            )}
+                        </p>
+                    )}
+                    <ManageSubscriptionButton />
+                </>
+            ) : (
+                <GetSubscriptionButton />
+            )}
         </main>
     );
 }

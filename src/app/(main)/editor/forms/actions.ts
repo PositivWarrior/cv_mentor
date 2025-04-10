@@ -1,7 +1,7 @@
 "use server";
 
 import openai from "@/lib/openai";
-import { canUseAiTools } from "@/lib/permissions";
+import { canUseAITools } from "@/lib/permissions";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import {
     GenerateSummaryInput,
@@ -20,8 +20,14 @@ export async function generateSummary(input: GenerateSummaryInput) {
     }
 
     const subscriptionLevel = await getUserSubscriptionLevel(userId);
+    console.log("User ID:", userId);
+    console.log("Subscription level:", subscriptionLevel);
 
-    if (!canUseAiTools(subscriptionLevel)) {
+    if (!canUseAITools(subscriptionLevel)) {
+        console.log(
+            "Cannot use AI tools with subscription level:",
+            subscriptionLevel,
+        );
         throw new Error("Upgrade your subscription to use this feature");
     }
 
@@ -98,8 +104,14 @@ export async function generateWorkExperience(
     }
 
     const subscriptionLevel = await getUserSubscriptionLevel(userId);
+    console.log("User ID:", userId);
+    console.log("Subscription level:", subscriptionLevel);
 
-    if (!canUseAiTools(subscriptionLevel)) {
+    if (!canUseAITools(subscriptionLevel)) {
+        console.log(
+            "Cannot use AI tools with subscription level:",
+            subscriptionLevel,
+        );
         throw new Error("Upgrade your subscription to use this feature");
     }
 

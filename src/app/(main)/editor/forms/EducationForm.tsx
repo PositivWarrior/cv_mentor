@@ -9,11 +9,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { EditorFormProps } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { educationSchema, EducationValues } from "@/lib/validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { GripHorizontal } from "lucide-react";
-import { useEffect } from "react";
-import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 import {
     closestCenter,
     DndContext,
@@ -23,6 +20,7 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
     arrayMove,
     SortableContext,
@@ -30,9 +28,11 @@ import {
     useSortable,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
-import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { GripHorizontal } from "lucide-react";
+import { useEffect } from "react";
+import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 
 export default function EducationForm({
     resumeData,
@@ -48,16 +48,13 @@ export default function EducationForm({
     useEffect(() => {
         const { unsubscribe } = form.watch(async (values) => {
             const isValid = await form.trigger();
-
             if (!isValid) return;
-
             setResumeData({
                 ...resumeData,
                 educations:
                     values.educations?.filter((edu) => edu !== undefined) || [],
             });
         });
-
         return unsubscribe;
     }, [form, resumeData, setResumeData]);
 
@@ -81,9 +78,7 @@ export default function EducationForm({
                 (field) => field.id === active.id,
             );
             const newIndex = fields.findIndex((field) => field.id === over.id);
-
             move(oldIndex, newIndex);
-
             return arrayMove(fields, oldIndex, newIndex);
         }
     }
@@ -93,10 +88,9 @@ export default function EducationForm({
             <div className="space-y-1.5 text-center">
                 <h2 className="text-2xl font-semibold">Education</h2>
                 <p className="text-sm text-muted-foreground">
-                    Add as many education as you want
+                    Add as many educations as you like.
                 </p>
             </div>
-
             <Form {...form}>
                 <form className="space-y-3">
                     <DndContext
@@ -109,10 +103,10 @@ export default function EducationForm({
                             items={fields}
                             strategy={verticalListSortingStrategy}
                         >
-                            {fields.map((filed, index) => (
+                            {fields.map((field, index) => (
                                 <EducationItem
-                                    id={filed.id}
-                                    key={filed.id}
+                                    id={field.id}
+                                    key={field.id}
                                     index={index}
                                     form={form}
                                     remove={remove}
@@ -120,7 +114,6 @@ export default function EducationForm({
                             ))}
                         </SortableContext>
                     </DndContext>
-
                     <div className="flex justify-center">
                         <Button
                             type="button"
@@ -133,7 +126,7 @@ export default function EducationForm({
                                 })
                             }
                         >
-                            Add Education
+                            Add education
                         </Button>
                     </div>
                 </form>
@@ -154,35 +147,21 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
         attributes,
         listeners,
         setNodeRef,
-        transition,
         transform,
+        transition,
         isDragging,
     } = useSortable({ id });
-
-    const handleDateChange = (
-        field: any,
-        e: React.ChangeEvent<HTMLInputElement>,
-    ) => {
-        const newValue = e.target.value;
-        field.onChange(newValue || undefined);
-    };
-
-    // Helper function to format dates for input elements
-    const formatDateForInput = (dateString?: string) => {
-        if (!dateString) return "";
-        return dateString;
-    };
 
     return (
         <div
             className={cn(
                 "space-y-3 rounded-md border bg-background p-3",
-                isDragging && "z-100 relative cursor-grab shadow-xl",
+                isDragging && "relative z-50 cursor-grab shadow-xl",
             )}
             ref={setNodeRef}
             style={{
-                transition,
                 transform: CSS.Transform.toString(transform),
+                transition,
             }}
         >
             <div className="flex justify-between gap-2">
@@ -193,7 +172,6 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                     {...listeners}
                 />
             </div>
-
             <FormField
                 control={form.control}
                 name={`educations.${index}.degree`}
@@ -207,7 +185,6 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                     </FormItem>
                 )}
             />
-
             <FormField
                 control={form.control}
                 name={`educations.${index}.school`}
@@ -221,37 +198,35 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                     </FormItem>
                 )}
             />
-
             <div className="grid grid-cols-2 gap-3">
                 <FormField
                     control={form.control}
                     name={`educations.${index}.startDate`}
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Start Date</FormLabel>
+                            <FormLabel>Start date</FormLabel>
                             <FormControl>
                                 <Input
+                                    {...field}
                                     type="date"
-                                    value={formatDateForInput(field.value)}
-                                    onChange={(e) => handleDateChange(field, e)}
+                                    value={field.value?.slice(0, 10)}
                                 />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
-
                 <FormField
                     control={form.control}
                     name={`educations.${index}.endDate`}
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>End Date</FormLabel>
+                            <FormLabel>End date</FormLabel>
                             <FormControl>
                                 <Input
+                                    {...field}
                                     type="date"
-                                    value={formatDateForInput(field.value)}
-                                    onChange={(e) => handleDateChange(field, e)}
+                                    value={field.value?.slice(0, 10)}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -259,7 +234,6 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                     )}
                 />
             </div>
-
             <Button
                 variant="destructive"
                 type="button"

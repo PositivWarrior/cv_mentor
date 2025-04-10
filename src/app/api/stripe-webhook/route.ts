@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
             env.STRIPE_WEBHOOK_SECRET,
         );
 
-        console.log(`Recieved event: ${event.type}`, event.data.object);
+        console.log(`Received event: ${event.type}`, event.data.object);
 
         switch (event.type) {
             case "checkout.session.completed":
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
         return new Response("Webhook processed successfully", { status: 200 });
     } catch (error) {
-        console.error(error);
+        console.error("Stripe webhook error:", error);
         return new Response("Internal server error", { status: 500 });
     }
 }
@@ -52,6 +52,10 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
         throw new Error("User ID not found in session metadata");
     }
 
+    console.log(
+        "Updating user metadata with Stripe customer ID:",
+        session.customer,
+    );
     (await clerkClient()).users.updateUserMetadata(userId, {
         privateMetadata: {
             stripeCustomerId: session.customer as string,
@@ -62,34 +66,46 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
 async function handleSubscriptionCreatedOrUpdated(subscriptionId: string) {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
+    console.log("Processing subscription:", subscription.id);
+    console.log("Subscription status:", subscription.status);
+    console.log("Subscription user ID:", subscription.metadata.userId);
+    console.log("Subscription price ID:", subscription.items.data[0].price.id);
+
     if (
         subscription.status === "active" ||
         subscription.status === "trialing" ||
         subscription.status === "past_due"
     ) {
-        await prisma.userSubscription.upsert({
-            where: {
-                userId: subscription.metadata.userId,
-            },
-            create: {
-                userId: subscription.metadata.userId,
-                stripeSubscriptionId: subscription.id,
-                stripeCustomerId: subscription.customer as string,
-                stripePriceId: subscription.items.data[0].price.id,
-                stripeCurrentPeriodEnd: new Date(
-                    subscription.current_period_end * 1000,
-                ),
-                stripeCancelAtPeriodEnd: subscription.cancel_at_period_end,
-            },
-            update: {
-                stripePriceId: subscription.items.data[0].price.id,
-                stripeCurrentPeriodEnd: new Date(
-                    subscription.current_period_end * 1000,
-                ),
-                stripeCancelAtPeriodEnd: subscription.cancel_at_period_end,
-            },
-        });
+        try {
+            const result = await prisma.userSubscription.upsert({
+                where: {
+                    userId: subscription.metadata.userId,
+                },
+                create: {
+                    userId: subscription.metadata.userId,
+                    stripeSubscriptionId: subscription.id,
+                    stripeCustomerId: subscription.customer as string,
+                    stripePriceId: subscription.items.data[0].price.id,
+                    stripeCurrentPeriodEnd: new Date(
+                        subscription.current_period_end * 1000,
+                    ),
+                    stripeCancelAtPeriodEnd: subscription.cancel_at_period_end,
+                },
+                update: {
+                    stripePriceId: subscription.items.data[0].price.id,
+                    stripeCurrentPeriodEnd: new Date(
+                        subscription.current_period_end * 1000,
+                    ),
+                    stripeCancelAtPeriodEnd: subscription.cancel_at_period_end,
+                },
+            });
+            console.log("Updated subscription in database:", result);
+        } catch (error) {
+            console.error("Error updating subscription in database:", error);
+            throw error;
+        }
     } else {
+        console.log("Deleting subscription from database - inactive status");
         await prisma.userSubscription.deleteMany({
             where: {
                 stripeCustomerId: subscription.customer as string,
@@ -99,6 +115,7 @@ async function handleSubscriptionCreatedOrUpdated(subscriptionId: string) {
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+    console.log("Deleting subscription:", subscription.id);
     await prisma.userSubscription.deleteMany({
         where: {
             stripeCustomerId: subscription.customer as string,

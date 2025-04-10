@@ -4,6 +4,9 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserSubscriptionLevel } from "@/lib/subscription";
 import ClientWrapper from "./ClientWrapper";
 
+// Add this to prevent caching
+export const dynamic = "force-dynamic";
+
 export default async function Layout({
     children,
 }: {

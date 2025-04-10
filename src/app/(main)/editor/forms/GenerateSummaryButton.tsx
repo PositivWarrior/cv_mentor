@@ -6,7 +6,7 @@ import { useState } from "react";
 import { generateSummary } from "./actions";
 import { useSubscriptionLevel } from "../../SubscriptionLevelProvider";
 import usePremiumModal from "@/hooks/usePremiumModal";
-import { canUseAiTools } from "@/lib/permissions";
+import { canUseAITools } from "@/lib/permissions";
 
 interface GenerateSummaryButtonProps {
     resumeData: ResumeValues;
@@ -26,7 +26,7 @@ export default function GenerateSummaryButton({
     const [loading, setLoading] = useState(false);
 
     async function handleClick() {
-        if (!canUseAiTools(subscriptionLevel)) {
+        if (!canUseAITools(subscriptionLevel)) {
             premiumModal.setOpen(true);
         }
 
