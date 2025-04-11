@@ -14,7 +14,6 @@ import { useState, useEffect } from "react";
 import { createCheckoutSession } from "./actions";
 import { env } from "@/env";
 import { useSubscriptionLevel } from "@/app/(main)/SubscriptionLevelProvider";
-import { Label } from "../ui/label";
 
 const premiumFeatures = ["AI tools", "Up to 3 resumes"];
 const premiumPlusFeatures = [
@@ -116,19 +115,33 @@ export default function PremiumModal() {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-2 pb-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Premium features</Label>
-                        <ul className="list-disc pl-5 text-sm">
-                            {premiumFeatures.map((feature) => (
-                                <li key={feature}>{feature}</li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="flex">
                         <div className="flex w-1/2 flex-col space-y-5">
                             <h3 className="text-center text-lg font-bold">
-                                Premium
+                                Pro
                             </h3>
+                            <ul className="list-inside space-y-2 px-4">
+                                {premiumFeatures.map((feature) => (
+                                    <li
+                                        key={feature}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="size-4 text-green-500"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                        {feature}
+                                    </li>
+                                ))}
+                            </ul>
                             <Button
                                 onClick={() =>
                                     handlePremiumClick(
@@ -136,17 +149,38 @@ export default function PremiumModal() {
                                     )
                                 }
                                 disabled={loading}
+                                className="mx-auto w-3/4"
                             >
-                                Get Premium
+                                Get Pro
                             </Button>
                         </div>
 
-                        <div className="mx-6 border-l"></div>
-
                         <div className="flex w-1/2 flex-col space-y-5">
                             <h3 className="bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-center text-lg font-bold text-transparent">
-                                Premium Plus
+                                Pro Plus
                             </h3>
+                            <ul className="list-inside space-y-2 px-4">
+                                {premiumPlusFeatures.map((feature) => (
+                                    <li
+                                        key={feature}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="size-4 text-green-500"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                        {feature}
+                                    </li>
+                                ))}
+                            </ul>
                             <Button
                                 variant="premium"
                                 onClick={() =>
@@ -155,8 +189,9 @@ export default function PremiumModal() {
                                     )
                                 }
                                 disabled={loading}
+                                className="mx-auto w-3/4"
                             >
-                                Get Premium Plus
+                                Get Pro Plus
                             </Button>
                         </div>
                     </div>

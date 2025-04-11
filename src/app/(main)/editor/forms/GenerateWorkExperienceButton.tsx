@@ -39,10 +39,8 @@ export default function GenerateWorkExperienceButton({
     onWorkExperienceGenerated,
 }: GenerateWorkExperienceButtonProps) {
     const subscriptionLevel = useSubscriptionLevel();
-    const { toast } = useToast();
     const premiumModal = usePremiumModal();
     const [showInputDialog, setShowInputDialog] = useState(false);
-    const [refreshing, setRefreshing] = useState(false);
 
     // Debug the current subscription level
     useEffect(() => {
@@ -51,27 +49,6 @@ export default function GenerateWorkExperienceButton({
             subscriptionLevel,
         );
     }, [subscriptionLevel]);
-
-    const refreshSubscription = async () => {
-        try {
-            setRefreshing(true);
-            const response = await fetch("/refresh-subscription");
-            if (!response.ok) {
-                throw new Error("Failed to refresh subscription");
-            }
-
-            // Force hard reload to update client state
-            window.location.reload();
-        } catch (error) {
-            console.error("Error refreshing subscription:", error);
-            toast({
-                variant: "destructive",
-                description: "Failed to refresh subscription status",
-            });
-        } finally {
-            setRefreshing(false);
-        }
-    };
 
     return (
         <>
@@ -90,8 +67,6 @@ export default function GenerateWorkExperienceButton({
                         );
 
                         // Try refreshing subscription first
-                        if (refreshing) return;
-
                         try {
                             await fetch("/billing/troubleshoot");
                             await new Promise((resolve) =>
