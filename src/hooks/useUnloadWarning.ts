@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export default function useUnloadWarning(condition: true) {
+export default function useUnloadWarning(condition: boolean) {
     useEffect(() => {
         if (!condition) {
             return;
