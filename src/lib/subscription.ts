@@ -1,7 +1,7 @@
 import { env } from "@/env";
 import prisma from "./prisma";
 
-export type SubscriptionLevel = "free" | "pro" | "pro_plus";
+export type SubscriptionLevel = "free" | "pro";
 
 export const getUserSubscriptionLevel = async (
     userId: string,
@@ -46,18 +46,12 @@ export const getUserSubscriptionLevel = async (
 
         if (
             subscription.stripePriceId ===
-            env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY
+                env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY ||
+            subscription.stripePriceId ===
+                env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_PLUS_MONTHLY
         ) {
             console.log("Returning pro tier");
             return "pro";
-        }
-
-        if (
-            subscription.stripePriceId ===
-            env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_PLUS_MONTHLY
-        ) {
-            console.log("Returning pro_plus tier");
-            return "pro_plus";
         }
 
         console.log("Invalid price ID, throwing error");

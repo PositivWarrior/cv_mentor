@@ -15,12 +15,8 @@ import { createCheckoutSession } from "./actions";
 import { env } from "@/env";
 import { useSubscriptionLevel } from "@/app/(main)/SubscriptionLevelProvider";
 
-const premiumFeatures = ["AI tools", "Up to 3 resumes"];
-const premiumPlusFeatures = [
-    ...premiumFeatures,
-    "Unlimited resumes",
-    "Customizations",
-];
+// Combine all features into the Pro plan
+const proFeatures = ["AI tools", "Unlimited resumes", "Customizations"];
 
 export default function PremiumModal() {
     const { open, setOpen } = usePremiumModal();
@@ -115,52 +111,13 @@ export default function PremiumModal() {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-2 pb-4">
-                    <div className="flex">
-                        <div className="flex w-1/2 flex-col space-y-5">
-                            <h3 className="text-center text-lg font-bold">
+                    <div className="flex justify-center">
+                        <div className="flex w-3/4 flex-col space-y-5">
+                            <h3 className="bg-gradient-to-r from-blue-600 to-purple-400 bg-clip-text text-center text-xl font-bold text-transparent">
                                 Pro
                             </h3>
                             <ul className="list-inside space-y-2 px-4">
-                                {premiumFeatures.map((feature) => (
-                                    <li
-                                        key={feature}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="size-4 text-green-500"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
-                                        {feature}
-                                    </li>
-                                ))}
-                            </ul>
-                            <Button
-                                onClick={() =>
-                                    handlePremiumClick(
-                                        env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY,
-                                    )
-                                }
-                                disabled={loading}
-                                className="mx-auto w-3/4"
-                            >
-                                Get Pro
-                            </Button>
-                        </div>
-
-                        <div className="flex w-1/2 flex-col space-y-5">
-                            <h3 className="bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-center text-lg font-bold text-transparent">
-                                Pro Plus
-                            </h3>
-                            <ul className="list-inside space-y-2 px-4">
-                                {premiumPlusFeatures.map((feature) => (
+                                {proFeatures.map((feature) => (
                                     <li
                                         key={feature}
                                         className="flex items-center gap-2"
@@ -185,13 +142,13 @@ export default function PremiumModal() {
                                 variant="premium"
                                 onClick={() =>
                                     handlePremiumClick(
-                                        env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_PLUS_MONTHLY,
+                                        env.NEXT_PUBLIC_STRIPE_PRICE_ID_PRO_MONTHLY,
                                     )
                                 }
                                 disabled={loading}
                                 className="mx-auto w-3/4"
                             >
-                                Get Pro Plus
+                                Get Pro
                             </Button>
                         </div>
                     </div>
