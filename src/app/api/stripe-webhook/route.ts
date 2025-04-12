@@ -56,7 +56,9 @@ async function handleSessionCompleted(session: Stripe.Checkout.Session) {
         "Updating user metadata with Stripe customer ID:",
         session.customer,
     );
-    (await clerkClient()).users.updateUserMetadata(userId, {
+    await (
+        await clerkClient()
+    ).users.updateUserMetadata(userId, {
         privateMetadata: {
             stripeCustomerId: session.customer as string,
         },
