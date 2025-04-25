@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/Mentor_1_upscale_nobg.png";
 import { UserButton } from "@clerk/nextjs";
 import { CreditCard } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -25,7 +25,7 @@ export default function Navbar() {
                     />
 
                     <span className="text-xl font-bold tracking-tight">
-                        AI Resume Builder
+                        CV Mentor - AI Resume Builder
                     </span>
                 </Link>
 

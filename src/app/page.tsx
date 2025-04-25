@@ -1,5 +1,5 @@
 import Image from "next/image";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/Mentor_1_upscale_nobg.png";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import resumePreview from "@/assets/resume-preview.jpg";
@@ -17,7 +17,7 @@ export default function Home() {
                 />
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
                     Create the{" "}
-                    <span className="inline-block bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
+                    <span className="inline-block bg-gradient-to-r from-orange-600 to-orange-400 bg-clip-text text-transparent">
                         Perfect Resume
                     </span>{" "}
                     in Minutes
