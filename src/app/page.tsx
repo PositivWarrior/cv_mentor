@@ -3,17 +3,8 @@ import logo from "@/assets/Mentor_1_upscale_nobg.png";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import resumePreview from "@/assets/JB_Resume.png";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 
 export default function Home() {
-    const contentRef = useRef<HTMLElement>(null);
-
-    const reactToPrintFn = useReactToPrint({
-        contentRef,
-        documentTitle: resume.title || "Resume",
-    });
-
     return (
         <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-100 px-5 py-12 text-center text-gray-900 md:flex-row md:text-start lg:gap-12">
             <div className="max-w-prose space-y-3">
