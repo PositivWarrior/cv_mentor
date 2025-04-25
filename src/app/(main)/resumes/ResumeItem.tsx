@@ -35,7 +35,7 @@ export default function ResumeItem({ resume }: ResumeItemProps) {
     const contentRef = useRef<HTMLDivElement>(null);
 
     const reactToPrintFn = useReactToPrint({
-        contentRef,
+        contentRef: contentRef as React.RefObject<Element>,
         documentTitle: resume.title || "Resume",
     });
 
